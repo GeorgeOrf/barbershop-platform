@@ -1,11 +1,14 @@
-import { shop } from "@/config/shop.config"
+import { fetchBarbers } from "@/lib/queries/barbers";
 
-export default function Barbers() {
+export default async function Barbers() {
+
+  const barbers = await fetchBarbers();
+
   return (
     <section id="barbers" className="mx-auto max-w-6xl px-6 py-20">
       <h2 className="text-2xl font-bold">Οι barbers μας</h2>
       <div className="mt-10 grid gap-6 md:grid-cols-2">
-        {shop.barbers.map((barber) => (
+        {barbers.map((barber) => (
           <div
             key={barber.id}
             className="rounded-lg border border-white/10 p-8 transition hover:border-primary"

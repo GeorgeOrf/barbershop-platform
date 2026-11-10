@@ -1,4 +1,4 @@
-import { shop } from "@/config/shop.config"
+import { Suspense } from "react";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Services from "@/components/Services";
@@ -10,9 +10,18 @@ export default function Home() {
     <>
         <Navbar />
         <Hero/>
+
+        <Suspense fallback={<p>Loading Services...</p>}>
         <Services/>
+        </Suspense>
+        
+        <Suspense fallback={<p>Loading Barbers...</p>}>
         <Barbers/>
+        </Suspense>
+
+        <Suspense fallback={<p>Loading hours...</p>}>
         <Hours/>
+        </Suspense>
     </>
   );
 }

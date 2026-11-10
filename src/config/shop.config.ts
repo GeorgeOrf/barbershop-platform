@@ -14,7 +14,7 @@ export type Barber = {
 }
 
 export type OpeningHours = {
-  day: string;
+  day: number;
   open: string | null;
   close: string | null;
 }
@@ -70,12 +70,12 @@ export const shop: ShopConfig = {
     }
   ],
   hours: [
-    { day: "Δευτέρα", open: "null", close: "null"},
-    { day: "Τρίτη", open: "09:00", close: "18:00"},
-    { day: "Τετάρτη", open: "09:00", close: "18:00"},
-    { day: "Πέμπτη", open: "09:00", close: "18:00"},
-    { day: "Παρασκευή", open: "09:00", close: "18:00"},
-    { day: "Σάββατο", open: "09:00", close: "18:00"},
-    { day: "Κυριακή", open: "null", close: "null"}
+    { day: 0, open: null, close: null},
+    { day: 1, open: "09:00", close: "18:00"},
+    { day: 2, open: "09:00", close: "18:00"},
+    { day: 3, open: "09:00", close: "18:00"},
+    { day: 4, open: "09:00", close: "18:00"},
+    { day: 5, open: "09:00", close: "18:00"},
+    { day: 6, open: null, close: null}
   ]
 }
