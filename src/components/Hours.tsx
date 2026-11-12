@@ -1,4 +1,5 @@
 import { fetchHours } from "@/lib/queries/hours";
+import { getBarbersAppointments } from "@/lib/queries/appointments";
 
   const dayNames = [
   "Δευτέρα",
@@ -13,6 +14,7 @@ import { fetchHours } from "@/lib/queries/hours";
 export default async function Hours() {
 
   const openingHours = await fetchHours();
+  const appointments = await getBarbersAppointments(1, new Date("2026-11-12"));
 
   return (
     <section id="hours" className="mx-auto max-w-3xl px-6 py-20 text-white">
@@ -54,6 +56,7 @@ export default async function Hours() {
               ))}
           </tbody>
         </table>
+          
       </div>
     </section>
   );

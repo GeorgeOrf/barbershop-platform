@@ -9,6 +9,7 @@ const adapter = new PrismaPg({
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
+
   await prisma.service.createMany({
     data: [
       {
@@ -19,7 +20,7 @@ async function main() {
       {
         name: "Κούρεμα & Μούσια",
         price: 18,
-        durationMin: 40
+        durationMin: 30
       },
       {
         name: "Παιδικό Κούρεμα",
@@ -56,6 +57,43 @@ async function main() {
     ],
     skipDuplicates: true,
   });
+
+
+//   const service = await prisma.service.findUnique({
+//     where: { name: "Κούρεμα"},
+//     select: {
+//       id: true,
+//       price: true,
+//       durationMin: true,
+//     }    
+//   });
+
+//   if(!service) {
+//     throw new Error("Service not found");
+//   }
+
+//   await prisma.appointment.createMany({
+//     data: {
+//       serviceId:  service.id,
+//       customerId: 1,
+//       barberId: 1,
+//       date: new Date("2026-11-12T10:30:00"),
+//       status: "CONFIRMED",
+//       price: service.price,
+//       durationMin: service.durationMin
+//     },
+//     skipDuplicates: true,
+//   });
+
+  await prisma.service.update({
+    where: {
+      id: 2,
+    },
+    data: {
+      durationMin: 30,
+    },
+  });
+
 }
 
 main()
