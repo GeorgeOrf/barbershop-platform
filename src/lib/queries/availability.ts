@@ -1,10 +1,11 @@
 
 import { prisma } from "../prisma";
+
 import { filterFreeSlots, generateSlots } from "../slots";
 import { getBarbersAppointments } from "./appointments";
 
-export default async function getAvaliableSlots(barberId: number, day: Date) {
-  const jsDay = day.getDay();
+export async function getAvailableSlots(barberId: number, day: string) {
+  const jsDay = new Date(`${day}T12:00:00Z`).getUTCDay();
   const dayOfWeek = jsDay === 0 ? 7 : jsDay;
 
   const openingHours = await prisma.openingHours.findUnique({

@@ -1,5 +1,6 @@
 
 import { prisma } from "../prisma";
+import { fromZonedTime } from "date-fns-tz";
 
 export async function getAppointments() {
   const appointments = await prisma.appointment.findMany({
@@ -12,13 +13,15 @@ export async function getAppointments() {
   return appointments;
 }
 
-export async function getBarbersAppointments(barberId: number, day: Date) {
+export async function getBarbersAppointments(barberId: number, day: string) {
 
-  const start = new Date(day);
-  start.setHours(0, 0, 0, 0);
+  const start = fromZonedTime(`${day}T00:00:00`, "Europe/Athens");
 
-  const end = new Date(start);
-  end.setDate(end.getDate() + 1);
+  const nextDay = new Date(`${day}T12:00:00Z`);
+  nextDay.setUTCDate(nextDay.getUTCDate() + 1);
+  const nextDayString = nextDay.toISOString().slice(0, 10);
+  
+  const end = fromZonedTime(`${nextDayString}T00:00:00`, "Europe/Athens");
 
   const barbersAppointments = await prisma.appointment.findMany({
     where: {
