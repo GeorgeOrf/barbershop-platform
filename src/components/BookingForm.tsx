@@ -1,7 +1,8 @@
 "use client"
 
 import { fetchFreeSlots } from "@/lib/actions/fetchFreeSlots";
-import { useState } from "react";
+import { getMonthDays } from "@/lib/calendar";
+import { useState, useEffect } from "react";
 
 type Service= {
     id: number;
@@ -30,45 +31,94 @@ export default function BookingForm({services, barbers, closedWeekdays}: Booking
     const [barberId, setBarberId] = useState(0);
     const [date, setDate] = useState("");
     const [timeSlot, setTimeSlot] = useState("");
+    const [service, setService] = useState(0);
 
+    const today = new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Athens" });
+    const dateParts = today.split("-").map(Number);
+    const monthDays = getMonthDays(dateParts[0], dateParts[1], today, closedWeekdays);
 
+    useEffect(() => {
+        if(barberId === 0 || !date) return;
+        fetchFreeSlots(barberId, date).then(setFreeSlots);
+    }, [barberId, date]);
     
 
     return (
-        <form>
-            <label htmlFor="name">Name:</label>
-            <input type="text" name="name" placeholder="Your Name" required />
-            <label htmlFor="email">Email:</label>
-            <input type="email" name="email" placeholder="Your Email" required />
-            <label htmlFor="phone">Phone:</label>
-            <input type="phone" name="phone" placeholder="Your Phone Number" required />
-            <select name="barber" required onChange={(e) => setBarberId(Number(e.target.value))}>
-                <option value="">Select a barber</option>
-                {barbers.map((barber) =>{
-                    return (
-                        <option key={barber.id} value={barber.id}>
-                            {barber.name}
-                        </option>
-                    )
-                })}
-            </select>
-            <select name="service" required>
-                <option value="">Select a service</option>
-                {services.map((service) => {
-                    return (
-                        <option key={service.id} value={service.id}>
-                            {service.name} - {service.price.toFixed(2)}€
-                        </option>
-                    )
-                })}
-            </select>
-            <select name="date" required>
-                <option value="">Select a date</option>
-                
-            </select>
-            <p>{barberId}</p>
-            <p>{closedWeekdays.join(",")}</p>
-        </form>
+        <>
+            <form>
+                <label htmlFor="name">Name:</label>
+                <input type="text" name="name" placeholder="Your Name" required />
+                <label htmlFor="email">Email:</label>
+                <input type="email" name="email" placeholder="Your Email" required />
+                <label htmlFor="phone">Phone:</label>
+                <input type="phone" name="phone" placeholder="Your Phone Number" required />
+    
+                <select name="barber"
+                    onChange={(e) => { 
+                    setBarberId(Number(e.target.value))
+                    setTimeSlot("");
+                    setFreeSlots([]);
+                    }} required >
+    
+                    <option value="">Select a barber</option>
+                    {barbers.map((barber) => {
+                        return (
+                            <option key={barber.id} value={barber.id}>
+                                {barber.name}
+                            </option>
+                        )
+                    })}
+                </select>
 
+                <select name="service"
+                    onChange={(e) => {
+                    setService(Number(e.target.value))
+                    }} required>
+                    <option value="">Select a service</option>
+                    {services.map((service) => {
+                        return (
+                            <option key={service.id} value={service.id}>
+                                {service.name} - {service.price.toFixed(2)}€
+                            </option>
+                        )
+                    })}
+                </select>
+
+                <select name="date" value={date} 
+                    onChange={(e) => {
+                    setDate(e.target.value)
+                    setTimeSlot("");
+                    setFreeSlots([]);
+                }} required>
+                    <option value="">Select a date</option>
+                        {monthDays.filter((day) => day.selectable)
+                        .map((day) => {
+                            return (
+                                <option key={day.date} value={day.date}>
+                                    {day.date}
+                                </option>
+                            )
+                        })}
+                </select>
+
+                {barberId !==0 && date && freeSlots.length === 0 && (
+                    <p>No free times for this day</p>
+                )}
+
+                {freeSlots.map((slot) => {
+                    return (
+                        <button 
+                        type="button"
+                        key={slot}
+                        onClick={() => setTimeSlot(slot)}
+                        className={slot === timeSlot ? "bg-white text-black" : "bg-black text-white"}
+                        >{slot}</button>
+                    );
+                })}
+
+                <button type="submit">Book</button>
+
+            </form>
+        </>
     );
 }
