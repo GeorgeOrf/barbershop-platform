@@ -10,8 +10,30 @@ export async function createBooking(serviceId: number, barberId: number, date: s
   const customerPhone = phone.trim().replace(/\s+/g, "");
   const customerEmail = email?.trim() || null;
 
+  const MAX_DAYS_AHEAD = 30;
+  const today = new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Athens" });
+  const limit = new Date(`${today}T12:00:00Z`);
+  limit.setUTCDate(limit.getUTCDate() + MAX_DAYS_AHEAD);
+  const maxDate = limit.toISOString().slice(0, 10);
+
   if(!serviceId || !barberId || !date || !timeSlot || !customerName || !customerPhone) {
-    return { success: false, error: "Missing fields"};
+    return { success: false as const, error: "Missing fields" };
+  }
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+  return { success: false as const, error: "Invalid date" };
+  }
+
+  if (!/^\d{2}:\d{2}$/.test(timeSlot)) {
+    return { success: false as const, error: "Invalid time slot"};
+  }
+
+  if (date < today) {
+    return { success: false as const, error: "You can't make a booking for a past date!"};
+  }
+
+  if (date > maxDate) {
+    return { success: false as const, error: "You can only book only a month in advance!"};
   }
 
   const service = await prisma.service.findUnique({
@@ -20,13 +42,13 @@ export async function createBooking(serviceId: number, barberId: number, date: s
   });
 
   if(!service) {
-    return { success: false, error: "Service not found"};
+    return { success: false as const, error: "Service not found"};
   }
 
   const freeSlots = await getAvailableSlots(barberId, date);
 
   if(!freeSlots.includes(timeSlot)) {
-    return { success: false, error: "Slot no longer available"};
+    return { success: false as const, error: "Slot no longer available"};
   }
 
   const appointmentDate = fromZonedTime(`${date}T${timeSlot}:00`, "Europe/Athens");
@@ -55,9 +77,9 @@ export async function createBooking(serviceId: number, barberId: number, date: s
     });
     return { customer, appointment };
   });
-    return { success: true, appointmentId: result.appointment.id };
+    return { success: true as const, appointmentId: result.appointment.id };
   }catch(error){ 
     console.error("Error creating booking:", error);
-    return {success: false, error: "Failed to create booking"};
+    return {success: false as const, error: "Failed to create booking"};
   }
 }

@@ -3,6 +3,7 @@
 import { fetchFreeSlots } from "@/lib/actions/fetchFreeSlots";
 import { getMonthDays } from "@/lib/calendar";
 import { useState, useEffect } from "react";
+import { createBooking } from "@/lib/actions/booking"
 
 type Service= {
     id: number;
@@ -31,7 +32,10 @@ export default function BookingForm({services, barbers, closedWeekdays}: Booking
     const [barberId, setBarberId] = useState(0);
     const [date, setDate] = useState("");
     const [timeSlot, setTimeSlot] = useState("");
-    const [service, setService] = useState(0);
+    const [serviceId, setServiceId] = useState(0);
+
+    const [message, setMessage] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const today = new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Athens" });
     const dateParts = today.split("-").map(Number);
@@ -41,17 +45,55 @@ export default function BookingForm({services, barbers, closedWeekdays}: Booking
         if(barberId === 0 || !date) return;
         fetchFreeSlots(barberId, date).then(setFreeSlots);
     }, [barberId, date]);
+
+    async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
+        e.preventDefault();
+        const form = e.currentTarget;
+
+        if(!serviceId || !barberId || !timeSlot || !date){
+            setMessage("Missing fields!");
+            return;
+        }
+
+        const formData = new FormData(form);
+        const name = String(formData.get("name"));
+        const email = String(formData.get("email"));
+        const phone = String(formData.get("phone"));
+
+        setMessage("");
+        setIsSubmitting(true);
+
+        try {
+            const result = await createBooking(serviceId, barberId, date, timeSlot, name, phone, email);
+            if(result.success) {
+                setMessage("Booking successful");
+                setTimeSlot("");
+                setBarberId(0);
+                setServiceId(0);
+                setDate("");
+                setFreeSlots([]);
+                form.reset();
+            } else {
+                setMessage(result.error);
+            }
+        } catch (error) {
+            console.error(error);
+            setMessage("Something went wrong, please try again!");
+        } finally {
+            setIsSubmitting(false);
+        }
+    }
     
 
     return (
         <>
-            <form>
+            <form onSubmit={handleSubmit}>
                 <label htmlFor="name">Name:</label>
                 <input type="text" name="name" placeholder="Your Name" required />
                 <label htmlFor="email">Email:</label>
-                <input type="email" name="email" placeholder="Your Email" required />
+                <input type="email" name="email" placeholder="Your Email"/>
                 <label htmlFor="phone">Phone:</label>
-                <input type="phone" name="phone" placeholder="Your Phone Number" required />
+                <input type="tel" name="phone" placeholder="Your Phone Number" required />
     
                 <select name="barber"
                     onChange={(e) => { 
@@ -72,7 +114,7 @@ export default function BookingForm({services, barbers, closedWeekdays}: Booking
 
                 <select name="service"
                     onChange={(e) => {
-                    setService(Number(e.target.value))
+                    setServiceId(Number(e.target.value))
                     }} required>
                     <option value="">Select a service</option>
                     {services.map((service) => {
@@ -116,8 +158,10 @@ export default function BookingForm({services, barbers, closedWeekdays}: Booking
                     );
                 })}
 
-                <button type="submit">Book</button>
-
+                <button type="submit" disabled={isSubmitting}>Book</button>
+                {(message && (
+                    <p>{message}</p>
+                ))}
             </form>
         </>
     );
