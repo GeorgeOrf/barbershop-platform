@@ -33,7 +33,7 @@ export async function createBooking(serviceId: number, barberId: number, date: s
   }
 
   if (date > maxDate) {
-    return { success: false as const, error: "You can only book only a month in advance!"};
+    return { success: false as const, error: "You can book only a month in advance!"};
   }
 
   const service = await prisma.service.findUnique({
@@ -78,8 +78,11 @@ export async function createBooking(serviceId: number, barberId: number, date: s
     return { customer, appointment };
   });
     return { success: true as const, appointmentId: result.appointment.id };
-  }catch(error){ 
-    console.error("Error creating booking:", error);
-    return {success: false as const, error: "Failed to create booking"};
+  } catch (error) {
+  if ((error as { code?: string }).code === "P2002") {
+    return { success: false as const, error: "Slot no longer available" };
   }
+  console.error("Error creating booking:", error);
+  return { success: false as const, error: "Failed to create booking" };
+}
 }

@@ -75,6 +75,8 @@ export default function BookingForm({services, barbers, closedWeekdays}: Booking
                 form.reset();
             } else {
                 setMessage(result.error);
+                setTimeSlot("");
+                fetchFreeSlots(barberId, date).then(setFreeSlots);
             }
         } catch (error) {
             console.error(error);
