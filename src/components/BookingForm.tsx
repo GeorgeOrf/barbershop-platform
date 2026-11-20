@@ -194,7 +194,7 @@ export default function BookingForm({ services, barbers, closedWeekdays }: Booki
         >
             <div className="flex flex-col gap-6">
 
-                <Step number={1} title="Choose a service">
+                <Step number={1} title="Διάλεξε υπηρεσία">
                     <div className="grid gap-3 sm:grid-cols-2">
                         {services.map((service) => {
                             const selected = service.id === serviceId;
@@ -213,7 +213,7 @@ export default function BookingForm({ services, barbers, closedWeekdays }: Booki
                                     <span>
                                         <span className="block font-medium">{service.name}</span>
                                         <span className={`block text-sm ${selected ? "text-neutral-300" : "text-neutral-500"}`}>
-                                            {service.durationMin} min
+                                            {service.durationMin} λεπτά
                                         </span>
                                     </span>
                                     <span className="text-lg font-semibold">{service.price.toFixed(2)}€</span>
@@ -223,7 +223,7 @@ export default function BookingForm({ services, barbers, closedWeekdays }: Booki
                     </div>
                 </Step>
 
-                <Step number={2} title="Choose your barber">
+                <Step number={2} title="Διάλεξε barber">
                     <div className="grid gap-3 sm:grid-cols-2">
                         {barbers.map((barber) => {
                             const selected = barber.id === barberId;
@@ -262,7 +262,7 @@ export default function BookingForm({ services, barbers, closedWeekdays }: Booki
                     </div>
                 </Step>
 
-                <Step number={3} title="Pick a day">
+                <Step number={3} title="Διάλεξε ημέρα">
                     <div className="mx-auto w-full max-w-md">
                         <div className="mb-3 flex items-center justify-between">
                             <button
@@ -324,7 +324,7 @@ export default function BookingForm({ services, barbers, closedWeekdays }: Booki
                     </div>
                 </Step>
 
-                <Step number={4} title="Pick a time">
+                <Step number={4} title="Διάλεξε ώρα">
                     {barberId === 0 || !date ? (
                         <p className="text-neutral-500">Choose a barber and a day to see the free times.</p>
                     ) : slotsLoading ? (
@@ -352,21 +352,22 @@ export default function BookingForm({ services, barbers, closedWeekdays }: Booki
                     )}
                 </Step>
 
-                <Step number={5} title="Your details">
+                <Step number={5} title="Τα στοιχεία σου">
+                    <p className="text-sm text-gray-500">Χρειαζόμαστε τα στοιχεία σου για λόγους επικοινωνίας και καλύτερης εξυπηρέτησης.</p>
                     <div className="grid gap-4 sm:grid-cols-2">
                         <div className="flex flex-col gap-1.5 sm:col-span-2">
-                            <label htmlFor="name" className="text-sm font-medium">Name</label>
+                            <label htmlFor="name" className="text-sm font-medium">Όνομα</label>
                             <input id="name" type="text" name="name" placeholder="Your name" required className={inputClass} />
                         </div>
                         <div className="flex flex-col gap-1.5">
-                            <label htmlFor="phone" className="text-sm font-medium">Phone</label>
+                            <label htmlFor="phone" className="text-sm font-medium">Τηλέφωνο Επικοινωνίας</label>
                             <input id="phone" type="tel" name="phone" placeholder="69XXXXXXXX" required className={inputClass}
                             inputMode="tel" pattern="[0-9+\s\-]{10,18}" title="Enter a valid phone number"
                             />
                         </div>
                         <div className="flex flex-col gap-1.5">
                             <label htmlFor="email" className="text-sm font-medium">
-                                Email <span className="font-normal text-neutral-500">(optional)</span>
+                                Email <span className="font-normal text-neutral-500">(Προαιρετικό)</span>
                             </label>
                             <input id="email" type="email" name="email" placeholder="you@example.com" className={inputClass} />
                         </div>
@@ -376,11 +377,11 @@ export default function BookingForm({ services, barbers, closedWeekdays }: Booki
 
             <aside className="lg:sticky lg:top-6 lg:self-start">
                 <div className="flex flex-col gap-5 rounded-2xl bg-neutral-900 p-6 text-white shadow-lg">
-                    <h2 className="text-lg font-semibold">Your booking</h2>
+                    <h2 className="text-lg font-semibold">Η κράτηση σου</h2>
 
                     <dl className="flex flex-col gap-3 text-sm">
                         <div className="flex justify-between gap-4">
-                            <dt className="text-neutral-400">Service</dt>
+                            <dt className="text-neutral-400">Υπηρεσία</dt>
                             <dd className="text-right">{selectedService ? selectedService.name : "—"}</dd>
                         </div>
                         <div className="flex justify-between gap-4">
@@ -388,11 +389,11 @@ export default function BookingForm({ services, barbers, closedWeekdays }: Booki
                             <dd className="text-right">{selectedBarber ? selectedBarber.name : "—"}</dd>
                         </div>
                         <div className="flex justify-between gap-4">
-                            <dt className="text-neutral-400">Day</dt>
+                            <dt className="text-neutral-400">Ημέρα</dt>
                             <dd className="text-right">{dateLabel ?? "—"}</dd>
                         </div>
                         <div className="flex justify-between gap-4">
-                            <dt className="text-neutral-400">Time</dt>
+                            <dt className="text-neutral-400">Ώρα</dt>
                             <dd className="text-right">{timeSlot || "—"}</dd>
                         </div>
                     </dl>

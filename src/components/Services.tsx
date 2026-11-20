@@ -5,7 +5,7 @@ export default async function Services() {
   const services = await fetchServices();
 
   return (
-    <section id="services" className="mx-auto max-w-6xl px-6 py-20">
+    <div className="mx-auto max-w-6xl px-6 py-20">
       <h2 className="text-2xl font-bold">Οι Υπηρεσίες μας</h2>
       <div className="mt-10 grid gap-6 md:grip-cols-2">
         {services.map((service) => (
@@ -23,6 +23,6 @@ export default async function Services() {
           </div>
         ))}
       </div>
-    </section>
+    </div>
   );
 }

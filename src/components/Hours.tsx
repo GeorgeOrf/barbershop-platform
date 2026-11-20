@@ -16,7 +16,7 @@ export default async function Hours() {
   const openingHours = await fetchHours();
 
   return (
-    <section id="hours" className="mx-auto max-w-3xl px-6 py-20 text-white">
+    <div className="mx-auto max-w-3xl px-6 py-20 text-white">
       <div className="text-center">
         <p className="text-xs uppercase tracking-[0.3em] text-white/50">
           Visit us
@@ -57,6 +57,6 @@ export default async function Hours() {
         </table>
           
       </div>
-    </section>
+    </div>
   );
 }

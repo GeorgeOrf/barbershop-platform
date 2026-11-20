@@ -5,7 +5,7 @@ export default async function Barbers() {
   const barbers = await fetchBarbers();
 
   return (
-    <section id="barbers" className="mx-auto max-w-6xl px-6 py-20">
+    <div className="mx-auto max-w-6xl px-6 py-20">
       <h2 className="text-2xl font-bold">Οι barbers μας</h2>
       <div className="mt-10 grid gap-6 md:grid-cols-2">
         {barbers.map((barber) => (
@@ -29,6 +29,6 @@ export default async function Barbers() {
           </div>
         ))}
         </div>
-    </section>
+    </div>
   );
 }
