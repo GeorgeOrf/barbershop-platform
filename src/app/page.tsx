@@ -11,7 +11,9 @@ import Footer from "@/components/Footer";
 export default function Home() {
   return (
     <>
-        <ScrollToHash/>
+        <Suspense fallback={null}>
+          <ScrollToHash/>
+        </Suspense>
         <Navbar />
         <Hero/>
 
@@ -34,6 +36,7 @@ export default function Home() {
         </section>
 
         <Footer/>
+
     </>
   );
 }

@@ -26,7 +26,9 @@ model Barber {
   name         String        @unique
   role         Roles         @default(BARBER)
   photo        String?
+  active       Boolean @default(true)
   appointments Appointment[]
+  closedDays ClosedDay[]
 }
 
 model OpeningHours {
@@ -34,6 +36,17 @@ model OpeningHours {
   dayOfWeek Int     @unique
   open      String?
   close     String?
+}
+
+model ClosedDay {
+  id Int @id @default(autoincrement())
+  startDate String 
+  endDate String?
+  barberId Int?
+  reason String?
+  barber Barber? @relation(fields: [barberId], references: [id])
+
+  @@index([startDate])
 }
 
 model Customer {
@@ -75,3 +88,4 @@ enum Roles {
   OWNER
   BARBER
 }
+

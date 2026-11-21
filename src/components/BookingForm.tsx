@@ -20,10 +20,17 @@ type Barber = {
     photo: string | null;
 };
 
+type ClosedDay = {
+    startDate: string;
+    endDate: string | null;
+    barberId: number | null;
+}
+
 type BookingFormProps = {
     services: Service[];
     barbers: Barber[];
     closedWeekdays: number[];
+    closedDays : ClosedDay[];
 };
 
 // Keep in sync with MAX_DAYS_AHEAD in lib/actions/booking.ts
@@ -53,7 +60,7 @@ function Step({ number, title, children }: { number: number; title: string; chil
 const inputClass =
     "w-full rounded-lg border border-neutral-300 bg-white px-3 py-2.5 outline-none transition focus:border-black focus:ring-2 focus:ring-black/10";
 
-export default function BookingForm({ services, barbers, closedWeekdays }: BookingFormProps) {
+export default function BookingForm({ services, barbers, closedWeekdays, closedDays }: BookingFormProps) {
 
     const today = new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Athens" });
     const maxDate = addDays(today, MAX_DAYS_AHEAD);
@@ -108,6 +115,15 @@ export default function BookingForm({ services, barbers, closedWeekdays }: Booki
         fetchFreeSlots(barberId, date).then((slots) => setSlotsResult({ key, slots }));
     }, [barberId, date]);
 
+    function isDayClosed(day: string, forBarberId: number) {
+        return closedDays.some(
+            (closed) => 
+            (closed.barberId === null || closed.barberId === forBarberId) &&
+            closed.startDate <= day &&
+            (closed.endDate ?? closed.startDate) >= day
+        );
+    }
+
     function changeMonth(delta: number) {
         setView((current) => {
             const index = current.year * 12 + (current.month - 1) + delta;
@@ -124,6 +140,7 @@ export default function BookingForm({ services, barbers, closedWeekdays }: Booki
         if (id !== barberId) {
             setBarberId(id);
             setTimeSlot("");
+            if(date && !isDayClosed(date, id)) setDate("");
         }
         setMessage("");
     }
@@ -298,7 +315,7 @@ export default function BookingForm({ services, barbers, closedWeekdays }: Booki
                             ))}
 
                             {monthDays.map((day) => {
-                                const available = day.selectable && day.date <= maxDate;
+                                const available = day.selectable && day.date <= maxDate && !isDayClosed(day.date, barberId);
                                 const selected = day.date === date;
                                 const isToday = day.date === today;
                                 return (

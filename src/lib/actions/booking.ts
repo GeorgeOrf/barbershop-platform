@@ -52,6 +52,15 @@ export async function createBooking(serviceId: number, barberId: number, date: s
     return { success: false as const, error: "Service not found"};
   }
 
+  const barber = await prisma.barber.findFirst({
+    where: { id: barberId, active: true },
+    select: {id: true},
+  });
+
+  if(!barber) {
+    return { success: false as const, error: "Barber not found"};
+  }
+
   const freeSlots = await getAvailableSlots(barberId, date);
 
   if(!freeSlots.includes(timeSlot)) {

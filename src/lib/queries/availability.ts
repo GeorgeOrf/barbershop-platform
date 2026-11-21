@@ -18,6 +18,21 @@ export async function getAvailableSlots(barberId: number, day: string) {
     minute: "2-digit"
   });
 
+  const closedDay = await prisma.closedDay.findFirst({
+    where: {
+      OR: [{barberId: null}, { barberId }],
+      startDate: { lte: day },
+      AND: [
+        { OR: [{ endDate: { gte: day } }, { startDate: day }] },
+      ],
+    },
+    select: { id: true},
+  });
+
+  if(closedDay){
+    return [];
+  }
+
   const openingHours = await prisma.openingHours.findUnique({
     where: { dayOfWeek },
   });
