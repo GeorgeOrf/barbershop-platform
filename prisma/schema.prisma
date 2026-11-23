@@ -23,12 +23,14 @@ model Service {
 
 model Barber {
   id           Int           @id @default(autoincrement())
+  userId       String?       @unique
   name         String        @unique
   role         Roles         @default(BARBER)
   photo        String?
   active       Boolean       @default(true)
   appointments Appointment[]
   closedDays   ClosedDay[]
+  user         User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
 
 model OpeningHours {
@@ -99,6 +101,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  barber        Barber?
 
   @@unique([email])
   @@map("user")
