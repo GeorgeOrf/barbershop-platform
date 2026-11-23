@@ -6,3 +6,8 @@ export async function fetchBarbers() {
     });
     return barbers;
 }
+
+export async function getAllBarbers() {
+    const allBarbers = await prisma.barber.findMany();
+    return allBarbers;
+}

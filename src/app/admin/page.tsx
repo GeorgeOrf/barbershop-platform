@@ -10,6 +10,10 @@ async function AdminContent() {
         redirect("/login");
     }
 
+    if(barber.role === "BARBER") {
+        redirect("/admin/staff");
+    }
+
     return (
         <p>
             Hello {barber.name}, your role is {barber.role}
