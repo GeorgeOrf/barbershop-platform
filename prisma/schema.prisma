@@ -26,9 +26,9 @@ model Barber {
   name         String        @unique
   role         Roles         @default(BARBER)
   photo        String?
-  active       Boolean @default(true)
+  active       Boolean       @default(true)
   appointments Appointment[]
-  closedDays ClosedDay[]
+  closedDays   ClosedDay[]
 }
 
 model OpeningHours {
@@ -39,12 +39,12 @@ model OpeningHours {
 }
 
 model ClosedDay {
-  id Int @id @default(autoincrement())
-  startDate String 
-  endDate String?
-  barberId Int?
-  reason String?
-  barber Barber? @relation(fields: [barberId], references: [id])
+  id        Int     @id @default(autoincrement())
+  startDate String
+  endDate   String?
+  barberId  Int?
+  reason    String?
+  barber    Barber? @relation(fields: [barberId], references: [id])
 
   @@index([startDate])
 }
@@ -52,7 +52,7 @@ model ClosedDay {
 model Customer {
   id           Int           @id @default(autoincrement())
   name         String
-  email        String?       
+  email        String?
   phone        String        @unique
   createdAt    DateTime      @default(now())
   appointments Appointment[]
@@ -89,3 +89,65 @@ enum Roles {
   BARBER
 }
 
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
