@@ -1,5 +1,6 @@
 import { getBarbersDayBooking } from "@/lib/queries/appointments";
 import DatePicker from "./DatePicker";
+import CancelButton from "./CancelButton";
 
 const TZ = "Europe/Athens";
 
@@ -29,6 +30,7 @@ export default async function BookingsView({
                             - {b.customer.name} ({b.customer.phone}) -{" "}
                             {b.service.name}, {b.durationMin} min,{" "}
                             {Number(b.price)}€
+                            <CancelButton appointmentId={b.id}/>
                         </li>
                     ))}
                 </ul>
