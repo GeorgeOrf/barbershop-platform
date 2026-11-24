@@ -1,6 +1,6 @@
 import { getBarbersDayBooking } from "@/lib/queries/appointments";
 import DatePicker from "./DatePicker";
-import CancelButton from "./CancelButton";
+import CancelButton from "./CancelAppointment";
 
 const TZ = "Europe/Athens";
 
