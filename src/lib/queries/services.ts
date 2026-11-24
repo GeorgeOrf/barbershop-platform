@@ -2,6 +2,8 @@
 import { prisma } from "../prisma";
 
 export async function fetchServices() {
-  const services = await prisma.service.findMany();
+  const services = await prisma.service.findMany({
+    where: { active: true},
+  });
   return services;
 }

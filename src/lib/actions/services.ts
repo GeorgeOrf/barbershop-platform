@@ -34,6 +34,39 @@ function validateServiceInput(
     };
 }
 
+
+export async function createService(name: string, description: string, price: number, durationMin: number) {
+
+    const current = await getCurrentBarber();
+
+    if(!current){
+        return {ok: false, error: "Invalid barber."}
+    }
+
+    if(current.role !== "OWNER") {
+        return {ok: false, error: "Not allowed."}
+    }
+
+    const parsed = validateServiceInput(name, description, price, durationMin);
+    if (!parsed.ok) return parsed;
+
+    try {
+        
+    await prisma.service.create({
+        data: parsed.data,
+    });
+
+    } catch (error) {
+       console.error(error);
+       return { ok: false, error: "Could not create the service." }  
+    }
+
+    revalidatePath("/admin", "layout");
+    return {ok: true};
+
+}
+
+
 export async function editService(serviceId: number, name: string, description: string, price: number, durationMin: number) {
     
     const current = await getCurrentBarber();
@@ -68,33 +101,29 @@ export async function editService(serviceId: number, name: string, description: 
     return {ok: true};
 }
 
-export async function createService(name: string, description: string, price: number, durationMin: number) {
-
+export async function setServiceActive(serviceId: number, active: boolean) {
     const current = await getCurrentBarber();
 
-    if(!current){
-        return {ok: false, error: "Invalid barber."}
+    if (!current) {
+        return { ok: false, error: "Invalid barber." };
     }
-
-    if(current.role !== "OWNER") {
-        return {ok: false, error: "Not allowed."}
+    if (current.role !== "OWNER") {
+        return { ok: false, error: "Not allowed." };
     }
-
-    const parsed = validateServiceInput(name, description, price, durationMin);
-    if (!parsed.ok) return parsed;
+    if (!Number.isInteger(serviceId) || typeof active !== "boolean") {
+        return { ok: false, error: "Invalid request." };
+    }
 
     try {
-        
-    await prisma.service.create({
-        data: parsed.data,
-    });
-
+        await prisma.service.update({
+            where: { id: serviceId },
+            data: { active },
+        });
     } catch (error) {
-       console.error(error);
-       return { ok: false, error: "Could not create the service." }  
+        console.error(error);
+        return { ok: false, error: "Could not update the service." };
     }
 
     revalidatePath("/admin", "layout");
-    return {ok: true};
-
+    return { ok: true };
 }

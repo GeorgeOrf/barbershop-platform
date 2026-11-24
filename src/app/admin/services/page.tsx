@@ -1,9 +1,10 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { getCurrentBarber } from "@/lib/get-session";
-import { fetchServices } from "@/lib/queries/services";
 import EditServiceForm from "@/components/admin/EditServiceForm";
 import Link from "next/link";
+import { fetchAllServices } from "@/lib/queries/servicesForAdmin";
+import ToggleServiceActive from "@/components/admin/ToggleServiceActive";
 
 async function ServicesContent() {
     const current = await getCurrentBarber();
@@ -11,7 +12,7 @@ async function ServicesContent() {
     if(!current) redirect("/login");
     if(current.role!== "OWNER") redirect("/admin");
 
-    const services = await fetchServices();
+    const services = await fetchAllServices();
 
     return (
         <>
@@ -28,6 +29,8 @@ async function ServicesContent() {
                                 price: Number(s.price),
                                 durationMin: s.durationMin,
                             }}/>
+                            <span>{s.active ? "Active" : "Inactive"}</span>
+                            <ToggleServiceActive serviceId={s.id} active={s.active} />
                         </div>
                     </li>
                 ))}

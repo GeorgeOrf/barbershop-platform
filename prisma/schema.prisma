@@ -19,6 +19,7 @@ model Service {
   price        Decimal       @db.Decimal(10, 2)
   durationMin  Int
   appointments Appointment[]
+  active       Boolean       @default(true)
 }
 
 model Barber {

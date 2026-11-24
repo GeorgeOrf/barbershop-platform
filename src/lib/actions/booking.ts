@@ -44,7 +44,7 @@ export async function createBooking(serviceId: number, barberId: number, date: s
   }
 
   const service = await prisma.service.findUnique({
-    where: { id: serviceId },
+    where: { id: serviceId, active: true },
     select: { price: true, durationMin: true}
   });
 
