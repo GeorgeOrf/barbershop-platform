@@ -4,25 +4,71 @@ import { revalidatePath } from "next/cache";
 import { getCurrentBarber } from "../get-session";
 import { prisma } from "../prisma";
 
-export async function editService(serviceId: number, name: string, description: string, price: number, durationMin: number) {
+function validateServiceInput(
+    name: string,
+    description: string,
+    price: number,
+    durationMin: number
+) {
     const cleanName = name.trim();
     const cleanDescription = description.trim() || null;
 
+    if (!cleanName) {
+        return { ok: false as const, error: "Name is required." };
+    }
+    if (!Number.isFinite(price) || price < 0) {
+        return { ok: false as const, error: "Invalid price." };
+    }
+    if (!Number.isInteger(durationMin) || durationMin <= 0) {
+        return { ok: false as const, error: "Invalid duration." };
+    }
+
+    return {
+        ok: true as const,
+        data: {
+            name: cleanName,
+            description: cleanDescription,
+            price: Math.round(price * 100) / 100,
+            durationMin,
+        },
+    };
+}
+
+export async function editService(serviceId: number, name: string, description: string, price: number, durationMin: number) {
+    
+    const current = await getCurrentBarber();
+
+    if(!current){
+        return {ok: false, error: "Invalid barber."}
+    }
+
+    if(current.role !== "OWNER") {
+        return {ok: false, error: "Not allowed."}
+    }
+    
     if (!Number.isInteger(serviceId)) {
     return { ok: false, error: "Invalid service." };
     }
 
-    if (!cleanName) {
-        return { ok: false, error: "Name is required." };
+    const parsed = validateServiceInput(name, description, price, durationMin);
+    if (!parsed.ok) return parsed;
+
+    try {
+    await prisma.service.update({
+        where: { id: serviceId},
+        data: parsed.data,
+    });
+
+    } catch (error) {
+       console.error(error);
+       return { ok: false, error: "Could not update the service." }  
     }
 
-    if (!Number.isFinite(price) || price < 0) {
-        return { ok: false, error: "Invalid price." };
-    }
+    revalidatePath("/admin", "layout");
+    return {ok: true};
+}
 
-    if (!Number.isInteger(durationMin) || durationMin <= 0) {
-        return { ok: false, error: "Invalid duration." };
-    }
+export async function createService(name: string, description: string, price: number, durationMin: number) {
 
     const current = await getCurrentBarber();
 
@@ -34,24 +80,21 @@ export async function editService(serviceId: number, name: string, description: 
         return {ok: false, error: "Not allowed."}
     }
 
+    const parsed = validateServiceInput(name, description, price, durationMin);
+    if (!parsed.ok) return parsed;
+
     try {
         
-    await prisma.service.update({
-        where: { id: serviceId},
-        data: {
-            name: cleanName,
-            description: cleanDescription,
-            price: Math.round(price * 100) / 100,
-            durationMin: durationMin,
-        },
+    await prisma.service.create({
+        data: parsed.data,
     });
 
     } catch (error) {
        console.error(error);
-       return { ok: false, error: "Could not update the service." }  
+       return { ok: false, error: "Could not create the service." }  
     }
-
 
     revalidatePath("/admin", "layout");
     return {ok: true};
+
 }
