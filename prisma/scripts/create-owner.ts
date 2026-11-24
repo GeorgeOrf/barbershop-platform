@@ -23,7 +23,7 @@ const main = async () => {
     });
     if(!owner) throw new Error("No OWNER barber found in the database.");
     if(owner.userId) {
-        console.log("Onwer already has an account. Nothing to do.");
+        console.log("Owner already has an account. Nothing to do.");
         return;
     }
 
