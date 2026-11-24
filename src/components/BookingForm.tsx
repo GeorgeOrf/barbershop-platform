@@ -1,3 +1,4 @@
+
 "use client"
 
 import { fetchFreeSlots } from "@/lib/actions/fetchFreeSlots";
@@ -31,6 +32,7 @@ type BookingFormProps = {
     barbers: Barber[];
     closedWeekdays: number[];
     closedDays : ClosedDay[];
+    submitAction?: typeof createBooking;
 };
 
 // Keep in sync with MAX_DAYS_AHEAD in lib/actions/booking.ts
@@ -60,7 +62,7 @@ function Step({ number, title, children }: { number: number; title: string; chil
 const inputClass =
     "w-full rounded-lg border border-neutral-300 bg-white px-3 py-2.5 outline-none transition focus:border-black focus:ring-2 focus:ring-black/10";
 
-export default function BookingForm({ services, barbers, closedWeekdays, closedDays }: BookingFormProps) {
+export default function BookingForm({ services, barbers, closedWeekdays, closedDays, submitAction = createBooking }: BookingFormProps) {
 
     const today = new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Athens" });
     const maxDate = addDays(today, MAX_DAYS_AHEAD);
@@ -178,7 +180,7 @@ export default function BookingForm({ services, barbers, closedWeekdays, closedD
         setIsSubmitting(true);
 
         try {
-            const result = await createBooking(serviceId, barberId, date, timeSlot, name, phone, email);
+            const result = await submitAction(serviceId, barberId, date, timeSlot, name, phone, email);
             if (result.success) {
                 setMessageOk(true);
                 setMessage("Booking confirmed! See you soon.");

@@ -2,7 +2,7 @@
 import { getCurrentBarber } from "../get-session"
 import { prisma } from "../prisma"
 import { revalidatePath } from "next/cache"
-
+import { createBooking } from "./booking"
 
 export async function cancelAppointment(appointmentId: number) {
 
@@ -39,4 +39,25 @@ export async function cancelAppointment(appointmentId: number) {
 
     revalidatePath("/admin", "layout");
     return {ok: true};
+}
+
+export async function createBookingAsStaff(serviceId: number, barberId: number, date: string, timeSlot: string, name: string, phone: string, email?: string) {
+    if(!Number.isInteger(barberId)){
+        return {success: false as const, error: "Invalid barber."}
+    }
+
+    const currentBarber = await getCurrentBarber();
+
+    if(!currentBarber) {
+        return {success: false as const, error: "Couldn't find barber."}
+    }
+
+    const booking = await createBooking(serviceId, barberId, date, timeSlot, name, phone, email);
+    
+    if(booking.success) {
+        revalidatePath("/admin", "layout");
+    }
+
+    return booking;
+
 }
