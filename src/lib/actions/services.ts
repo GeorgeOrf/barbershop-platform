@@ -127,3 +127,39 @@ export async function setServiceActive(serviceId: number, active: boolean) {
     revalidatePath("/admin", "layout");
     return { ok: true };
 }
+
+export async function deleteService(serviceId: number) {
+    const current = await getCurrentBarber();
+
+    if (!current) {
+        return { ok: false, error: "Invalid barber." };
+    }
+    if (current.role !== "OWNER") {
+        return { ok: false, error: "Not allowed." };
+    }
+    if (!Number.isInteger(serviceId)) {
+        return { ok: false, error: "Invalid request." };
+    }
+
+    try {
+        await prisma.service.delete({ where: { id: serviceId, active: false}});
+    } catch (error) {
+    const code = (error as { code?: string }).code;
+
+    if (code === "P2003") {
+        return {
+            ok: false,
+            error: "This service has bookings and can't be deleted. Keep it deactivated instead.",
+        };
+    }
+    if (code === "P2025") {
+        return { ok: false, error: "Service not found, or it's still active." };
+    }
+
+    console.error(error);
+    return { ok: false, error: "Could not delete the service." };
+}
+
+    revalidatePath("/admin", "layout");
+    return { ok: true };
+}

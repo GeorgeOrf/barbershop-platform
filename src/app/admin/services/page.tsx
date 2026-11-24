@@ -5,6 +5,7 @@ import EditServiceForm from "@/components/admin/EditServiceForm";
 import Link from "next/link";
 import { fetchAllServices } from "@/lib/queries/servicesForAdmin";
 import ToggleServiceActive from "@/components/admin/ToggleServiceActive";
+import DeleteService from "@/components/admin/DeleteService";
 
 async function ServicesContent() {
     const current = await getCurrentBarber();
@@ -31,6 +32,7 @@ async function ServicesContent() {
                             }}/>
                             <span>{s.active ? "Active" : "Inactive"}</span>
                             <ToggleServiceActive serviceId={s.id} active={s.active} />
+                            {!s.active && <DeleteService serviceId={s.id} />}
                         </div>
                     </li>
                 ))}
