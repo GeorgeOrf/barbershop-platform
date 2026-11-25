@@ -15,14 +15,17 @@ async function AuthGate({ children }: { children: React.ReactNode }) {
         <>
             <nav>
                 {barber.role === "OWNER" && (
-                    <div>
+                    <div className="flex gap-6">
                         <Link href="/admin/barbers">Barbers</Link>
                         <Link href="/admin/services">Services</Link>
+                        <Link href="/admin/schedule">Schedule</Link>
                     </div>
                 )}{" "}
-                <Link href="/admin/staff">My bookings</Link>{" "}
-                <span>{barber.name}</span> <SignOutButton />
-                <Link href="/admin/bookings/new">Create new booking</Link>
+                <div className="flex gap-6">
+                    <Link href="/admin/staff">My bookings</Link>{" "}
+                    <span>{barber.name}</span> <SignOutButton />
+                    <Link href="/admin/bookings/new">Create new booking</Link>
+                </div>
             </nav>
             {children}
         </>

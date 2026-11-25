@@ -1,0 +1,55 @@
+import { Suspense } from "react";
+import { redirect } from "next/navigation";
+import { getCurrentBarber } from "@/lib/get-session";
+import Link from "next/link";
+import { fetchHours, fetchDays } from "@/lib/queries/hours";
+import EditHoursForm from "@/components/admin/EditHoursForm";
+
+const dayNames = [
+  "Δευτέρα",
+  "Τρίτη",
+  "Τετάρτη",
+  "Πέμπτη",
+  "Παρασκευή",
+  "Σάββατο",
+  "Κυριακή",
+  ];
+
+async function ScheduleContent() {
+    const current = await getCurrentBarber();
+
+    if(!current) redirect("/login");
+    if(current.role !==  "OWNER") redirect("/admin");
+
+    const hours = await fetchHours();
+
+    return (
+        <>
+            <ul>
+                {hours
+                .sort((a, b) => a.dayOfWeek - b.dayOfWeek)
+                .map((h) => (
+                        <li key={h.id}>
+                            <span>{dayNames[h.dayOfWeek - 1]}</span>
+                            <EditHoursForm 
+                            hours={{
+                                id: h.id,
+                                dayOfWeek: h.dayOfWeek,
+                                open: h.open,
+                                close: h.close,
+                            }}/>
+                        </li>
+                ))}
+            </ul>
+        </>
+    );
+}
+
+export default function HoursPage() {
+    return (
+        <Suspense fallback={<p>Loading...</p>}>
+            <ScheduleContent/>
+        </Suspense>
+
+    );
+}

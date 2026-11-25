@@ -1,5 +1,4 @@
 import { fetchHours } from "@/lib/queries/hours";
-import { getBarbersAppointments } from "@/lib/queries/appointments";
 
   const dayNames = [
   "Δευτέρα",
