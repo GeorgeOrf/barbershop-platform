@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { editHours } from "@/lib/actions/schedule"
+import { editHours } from "@/lib/actions/editHours"
 
 type HoursProp = {
     id: number;
