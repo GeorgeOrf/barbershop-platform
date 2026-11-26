@@ -1,3 +1,4 @@
+"use server"
 import { getCurrentBarber } from "../get-session";
 import { fromZonedTime } from "date-fns-tz";
 import { revalidatePath } from "next/cache";
@@ -52,8 +53,8 @@ export async function createClosedDay(
     try {
         await prisma.closedDay.create({
             data: {
-                startDate: new Date(`${startDate}T00:00:00Z`),
-                endDate: end ? new Date(`${end}T00:00:00Z`) : null,
+                startDate,
+                endDate: end,
                 barberId,
             }
         });
@@ -80,4 +81,28 @@ export async function createClosedDay(
 
     revalidatePath("/admin", "layout");
     return {ok: true, affected};
+}
+
+export async function deleteClosedDay(closedDayId: number) {
+    const current = await getCurrentBarber();
+
+    if (!current) {
+        return { ok: false, error: "Invalid barber." };
+    }
+    if (current.role !== "OWNER") {
+        return { ok: false, error: "Not allowed." };
+    }
+    if (!Number.isInteger(closedDayId)) {
+        return { ok: false, error: "Invalid request." };
+    }
+
+    try {
+        await prisma.closedDay.delete({ where: { id: closedDayId } });
+    } catch (error) {
+        console.error(error);
+        return { ok: false, error: "Could not delete the closed day." };
+    }
+
+    revalidatePath("/admin", "layout");
+    return { ok: true };
 }

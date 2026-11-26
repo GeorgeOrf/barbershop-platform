@@ -10,6 +10,7 @@ export async function fetchUpcomingClosedDays() {
         { endDate: null, startDate: { gte: today } },
       ],
     },
-    select: { startDate: true, endDate: true, barberId: true },
+    select: { id: true, startDate: true, endDate: true, barberId: true, barber: { select: { name: true }}},
+    orderBy: { startDate: "asc" },
   });
 }
