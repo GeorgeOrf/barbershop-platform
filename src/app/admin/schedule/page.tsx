@@ -81,7 +81,7 @@ async function DaysOffContent() {
 
 export default function HoursPage() {
     return (
-        <p>
+        <>
             <Suspense fallback={<p>Loading...</p>}>
                 <ScheduleContent/>
             </Suspense>
@@ -89,7 +89,7 @@ export default function HoursPage() {
             <Suspense fallback={<p>Loading...</p>}>
                 <DaysOffContent/>
             </Suspense>
-        </p>
+        </>
 
     );
 }
